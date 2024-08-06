@@ -12,6 +12,27 @@ df = pd.read_excel(r'M:/Planejamento/Jovem Aprendiz/acompanhamento_RIOS.xlsb', s
     columns={'Rio':'rio', 'Ano':'year', 'Mês':'month', 'Dia':'day', 'Cota':'altura'}
 )
 
+df = pd.read_excel(path+'\\nivel_dos_rios_ultimos_5_anos.xlsx')
+
+# Fragmentar a coluna 'Data' em colunas separadas de dia, mês e ano
+df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y')
+df['Dia'] = df['Data'].dt.day
+df['Mês'] = df['Data'].dt.month
+df['Ano'] = df['Data'].dt.year
+
+# Derreter o DataFrame para que as colunas dos rios se tornem linhas
+df_melted = df.melt(id_vars=['Data', 'Dia', 'Mês', 'Ano'], var_name='Rio', value_name='Cota')
+
+# Filtrar as linhas para manter apenas as linhas com valores de cota
+df_melted = df_melted.dropna(subset=['Cota'])
+
+# Remover a coluna 'Data' já que temos dia, mês e ano
+df_melted = df_melted.drop(columns=['Data'])
+
+# Reorganizar as colunas para uma melhor visualização
+df_melted = df_melted[['Ano', 'Mês', 'Dia', 'Rio', 'Cota']].rename(columns={'Rio':'rio','Ano':'year','Mês':'month','Dia':'day','Cota':'altura'})
+
+df=df_melted.copy()
 # Crie a interface do usuário
 st.title('Dashboard dos Níveis dos Rios')
 
