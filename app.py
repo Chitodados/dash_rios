@@ -7,8 +7,7 @@ import os
 # Configuração do seaborn
 sns.set(style='whitegrid')
 
-
-df = pd.read_excel(path+'\\nivel_dos_rios_ultimos_5_anos.xlsx')
+df = pd.read_excel('nivel_dos_rios_ultimos_5_anos.xlsx')
 
 # Fragmentar a coluna 'Data' em colunas separadas de dia, mês e ano
 df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y')
