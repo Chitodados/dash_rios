@@ -35,7 +35,7 @@ st.title('Dashboard dos Níveis dos Rios')
 available_rivers = df['rio'].unique()
 selected_rivers = st.multiselect('Escolha o(s) rio(s)', available_rivers, default=available_rivers)
 
-available_years = df['Ano'].unique()
+available_years = df['year'].unique()
 selected_years = st.multiselect('Escolha o(s) ano(s)', available_years, default=available_years)
 
 # Filtra os dados com base nos rios selecionados
