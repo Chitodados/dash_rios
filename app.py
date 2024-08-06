@@ -7,10 +7,6 @@ import os
 # Configuração do seaborn
 sns.set(style='whitegrid')
 
-# Carregue o DataFrame
-df = pd.read_excel(r'M:/Planejamento/Jovem Aprendiz/acompanhamento_RIOS.xlsb', sheet_name='BASE').rename(
-    columns={'Rio':'rio', 'Ano':'year', 'Mês':'month', 'Dia':'day', 'Cota':'altura'}
-)
 
 df = pd.read_excel(path+'\\nivel_dos_rios_ultimos_5_anos.xlsx')
 
