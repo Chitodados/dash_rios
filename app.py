@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Aug  6 11:12:59 2024
-
-@author: 155682
-"""
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -34,7 +27,7 @@ selected_date = st.date_input('Escolha a data', value=data_max, min_value=data_m
 available_rivers = df.columns[1:]  # Assume que a primeira coluna é a data
 selected_river = st.selectbox('Escolha o rio', available_rivers)
 
-# Filtra os dados com base na data e o rio selecionado
+# Filtra os dados com base na data e no rio selecionado
 filtered_data = df[df['Data'] == pd.to_datetime(selected_date)]
 
 if not filtered_data.empty:
@@ -65,10 +58,6 @@ if not filtered_data.empty:
         plt.gca().set_facecolor('#f0f0f0')
 
         # Mostra o gráfico no Streamlit
-        st.pyplot(plt)
-
-else:
-    st.write('Nenhum dado disponível para a data e o rio selecionados.')
         st.pyplot(plt)
 
 else:
