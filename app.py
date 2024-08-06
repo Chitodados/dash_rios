@@ -5,7 +5,6 @@ Created on Tue Aug  6 11:12:59 2024
 @author: 155682
 """
 
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -16,7 +15,7 @@ from datetime import datetime
 sns.set(style='whitegrid')
 
 # Carregue o DataFrame
-df = pd.read_excel('M:/Planejamento/Lucas/Webscrapping_rios/nivel_dos_rios_ultimos_5_anos.xlsx')
+df = pd.read_excel('nivel_dos_rios_ultimos_5_anos.xlsx')
 
 # Converta a coluna 'Data' para o formato de data
 df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y')
@@ -66,6 +65,10 @@ if not filtered_data.empty:
         plt.gca().set_facecolor('#f0f0f0')
 
         # Mostra o gráfico no Streamlit
+        st.pyplot(plt)
+
+else:
+    st.write('Nenhum dado disponível para a data e o rio selecionados.')
         st.pyplot(plt)
 
 else:
