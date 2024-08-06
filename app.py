@@ -30,7 +30,7 @@ df_melted = df_melted[['Ano', 'Mês', 'Dia', 'Rio', 'Cota']].rename(columns={'Ri
 df = df_melted.copy()
 
 # Crie a interface do usuário
-st.title('Dashboard dos Níveis dos Rios')
+st.title('Dashboard dos nível dos Rios')
 
 # Opção de seleção múltipla de rios
 available_rivers = df['rio'].unique()
