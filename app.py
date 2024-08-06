@@ -27,7 +27,8 @@ df_melted = df_melted.drop(columns=['Data'])
 # Reorganizar as colunas para uma melhor visualização
 df_melted = df_melted[['Ano', 'Mês', 'Dia', 'Rio', 'Cota']].rename(columns={'Rio':'rio','Ano':'year','Mês':'month','Dia':'day','Cota':'altura'})
 
-df=df_melted.copy()
+df = df_melted.copy()
+
 # Crie a interface do usuário
 st.title('Dashboard dos Níveis dos Rios')
 
@@ -39,7 +40,7 @@ available_years = df['year'].unique()
 selected_years = st.multiselect('Escolha o(s) ano(s)', available_years, default=available_years)
 
 # Filtra os dados com base nos rios selecionados
-filtered_data = df[df['rio'].isin(selected_rivers)]
+filtered_data = df[df['rio'].isin(selected_rivers) & df['year'].isin(selected_years)]
 
 if not filtered_data.empty:
     # Agrupa os dados por rio
@@ -59,6 +60,7 @@ if not filtered_data.empty:
         plt.xticks(ticks=range(1, 13))
         plt.xlabel('Mês', fontsize=14)
         plt.ylabel('Cota (m)', fontsize=14)
+        plt.title(f'Níveis do Rio {rio}', fontsize=16)
         plt.gca().spines['top'].set_visible(False)
         plt.gca().spines['right'].set_visible(False)
         plt.gca().spines['left'].set_linewidth(1.5)
