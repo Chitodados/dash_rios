@@ -2,11 +2,11 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 
 # Configuração do seaborn
 sns.set(style='whitegrid')
 
-# Carregar os dados do Excel
 df = pd.read_excel('nivel_dos_rios_ultimos_5_anos.xlsx')
 
 # Fragmentar a coluna 'Data' em colunas separadas de dia, mês e ano
@@ -49,12 +49,15 @@ if not filtered_data.empty:
     for rio, data in rios:
         plt.figure(figsize=(18, 8))
         
-        # Plot dos dados diários sem média e desvio padrão
-        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=2, marker='o')
+        # Plot das linhas com transparência padrão (1.0) e incluir na legenda
+        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=3, estimator='mean', ci=None)
+        
+        # Plot das sombras dos desvios com maior transparência (alpha=0.2) e não incluir na legenda
+        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=0, estimator='mean', ci='sd', alpha=0.1, legend=False)
         
         sns.despine(offset=10, trim=True)
         plt.legend(loc='upper right')
-        plt.xticks(ticks=range(1, 13), labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+        plt.xticks(ticks=range(1, 13))
         plt.xlabel('Mês', fontsize=14)
         plt.ylabel('Cota (m)', fontsize=14)
         plt.title(f'Níveis do Rio {rio}', fontsize=16)
