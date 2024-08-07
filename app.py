@@ -7,6 +7,7 @@ import os
 # Configuração do seaborn
 sns.set(style='whitegrid')
 
+# Carregar o DataFrame
 df = pd.read_excel('nivel_dos_rios_ultimos_5_anos.xlsx')
 
 # Fragmentar a coluna 'Data' em colunas separadas de dia, mês e ano
@@ -25,19 +26,25 @@ df_melted = df_melted.dropna(subset=['Cota'])
 df_melted = df_melted.drop(columns=['Data'])
 
 # Reorganizar as colunas para uma melhor visualização
-df_melted = df_melted[['Ano', 'Mês', 'Dia', 'Rio', 'Cota']].rename(columns={'Rio':'rio','Ano':'year','Mês':'month','Dia':'day','Cota':'altura'})
+df_melted = df_melted[['Ano', 'Mês', 'Dia', 'Rio', 'Cota']].rename(columns={'Rio': 'rio', 'Ano': 'year', 'Mês': 'month', 'Dia': 'day', 'Cota': 'altura'})
 
 df = df_melted.copy()
 
 # Crie a interface do usuário
 st.title('Dashboard sobre o nível dos Rios')
 
-# Opção de seleção múltipla de rios
+# Descrição do dashboard
+st.markdown("""
+    Este dashboard apresenta os níveis dos rios ao longo dos anos. Use as opções abaixo para filtrar os dados e visualizar os gráficos.
+    """)
+
+# Seções para selecionar rios e anos
+st.sidebar.header('Filtros')
 available_rivers = df['rio'].unique()
-selected_rivers = st.multiselect('Escolha o(s) rio(s)', available_rivers, default=available_rivers)
+selected_rivers = st.sidebar.multiselect('Escolha o(s) rio(s)', available_rivers, default=available_rivers)
 
 available_years = df['year'].unique()
-selected_years = st.multiselect('Escolha o(s) ano(s)', available_years, default=available_years)
+selected_years = st.sidebar.multiselect('Escolha o(s) ano(s)', available_years, default=available_years)
 
 # Filtra os dados com base nos rios selecionados
 filtered_data = df[df['rio'].isin(selected_rivers) & df['year'].isin(selected_years)]
@@ -47,13 +54,13 @@ if not filtered_data.empty:
     rios = filtered_data.groupby('rio')
 
     for rio, data in rios:
-        plt.figure(figsize=(18, 8))
+        fig, ax = plt.subplots(figsize=(18, 8))
         
         # Plot das linhas com transparência padrão (1.0) e incluir na legenda
-        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=3, estimator='mean', ci=None)
+        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=3, estimator='mean', ci=None, ax=ax)
         
         # Plot das sombras dos desvios com maior transparência (alpha=0.2) e não incluir na legenda
-        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=0, estimator='mean', ci='sd', alpha=0.1, legend=False)
+        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=0, estimator='mean', ci='sd', alpha=0.1, legend=False, ax=ax)
         
         sns.despine(offset=10, trim=True)
         plt.legend(loc='upper right')
@@ -71,6 +78,18 @@ if not filtered_data.empty:
         plt.gca().set_facecolor('#f0f0f0')
         
         # Mostra o gráfico no Streamlit
-        st.pyplot(plt)
+        st.pyplot(fig)
 else:
     st.write('Nenhum dado disponível para os rios selecionados.')
+
+# Adicionar CSS personalizado
+st.markdown("""
+    <style>
+        .sidebar .sidebar-content {
+            background-color: #f0f0f0;
+        }
+        .sidebar .sidebar-content h2 {
+            color: #333;
+        }
+    </style>
+    """, unsafe_allow_html=True)
