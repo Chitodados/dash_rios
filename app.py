@@ -2,11 +2,11 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
 
 # Configuração do seaborn
 sns.set(style='whitegrid')
 
+# Carregar os dados do Excel
 df = pd.read_excel('nivel_dos_rios_ultimos_5_anos.xlsx')
 
 # Fragmentar a coluna 'Data' em colunas separadas de dia, mês e ano
@@ -25,7 +25,7 @@ df_melted = df_melted.dropna(subset=['Cota'])
 df_melted = df_melted.drop(columns=['Data'])
 
 # Reorganizar as colunas para uma melhor visualização
-df_melted = df_melted[['Ano', 'Mês', 'Dia', 'Rio', 'Cota']].rename(columns={'Rio': 'rio', 'Ano': 'year', 'Mês': 'month', 'Dia': 'day', 'Cota': 'altura'})
+df_melted = df_melted[['Ano', 'Mês', 'Dia', 'Rio', 'Cota']].rename(columns={'Rio':'rio','Ano':'year','Mês':'month','Dia':'day','Cota':'altura'})
 
 df = df_melted.copy()
 
@@ -50,11 +50,11 @@ if not filtered_data.empty:
         plt.figure(figsize=(18, 8))
         
         # Plot dos dados diários sem média e desvio padrão
-        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=1)
+        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=1, marker='o')
         
         sns.despine(offset=10, trim=True)
         plt.legend(loc='upper right')
-        plt.xticks(ticks=range(1, 13))
+        plt.xticks(ticks=range(1, 13), labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
         plt.xlabel('Mês', fontsize=14)
         plt.ylabel('Cota (m)', fontsize=14)
         plt.title(f'Níveis do Rio {rio}', fontsize=16)
