@@ -25,7 +25,7 @@ df_melted = df_melted.dropna(subset=['Cota'])
 df_melted = df_melted.drop(columns=['Data'])
 
 # Reorganizar as colunas para uma melhor visualização
-df_melted = df_melted[['Ano', 'Mês', 'Dia', 'Rio', 'Cota']].rename(columns={'Rio':'rio','Ano':'year','Mês':'month','Dia':'day','Cota':'altura'})
+df_melted = df_melted[['Ano', 'Mês', 'Dia', 'Rio', 'Cota']].rename(columns={'Rio': 'rio', 'Ano': 'year', 'Mês': 'month', 'Dia': 'day', 'Cota': 'altura'})
 
 df = df_melted.copy()
 
@@ -49,11 +49,8 @@ if not filtered_data.empty:
     for rio, data in rios:
         plt.figure(figsize=(18, 8))
         
-        # Plot das linhas com transparência padrão (1.0) e incluir na legenda
-        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=3, estimator='mean', ci=None)
-        
-        # Plot das sombras dos desvios com maior transparência (alpha=0.2) e não incluir na legenda
-        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=0, estimator='mean', ci='sd', alpha=0.1, legend=False)
+        # Plot dos dados diários sem média e desvio padrão
+        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=1)
         
         sns.despine(offset=10, trim=True)
         plt.legend(loc='upper right')
