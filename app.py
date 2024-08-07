@@ -50,7 +50,7 @@ if not filtered_data.empty:
         plt.figure(figsize=(18, 8))
         
         # Plot dos dados diários sem média e desvio padrão
-        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=1, marker='o')
+        sns.lineplot(data=data, x="month", y="altura", hue="year", palette="husl", linewidth=2, marker='o')
         
         sns.despine(offset=10, trim=True)
         plt.legend(loc='upper right')
