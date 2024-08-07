@@ -81,15 +81,3 @@ if not filtered_data.empty:
         st.pyplot(fig)
 else:
     st.write('Nenhum dado disponível para os rios selecionados.')
-
-# Adicionar CSS personalizado
-st.markdown("""
-    <style>
-        .sidebar .sidebar-content {
-            background-color: #f0f0f0;
-        }
-        .sidebar .sidebar-content h2 {
-            color: #333;
-        }
-    </style>
-    """, unsafe_allow_html=True)
