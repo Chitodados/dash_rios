@@ -21,9 +21,6 @@ sns.set(style='whitegrid')
 file_url = "https://raw.githubusercontent.com/Chitolina/dash_rios/blob/main/dados_rios/nivel_dos_rios_ultimos_5_anos.xlsx"
 
 
-# URL do arquivo Excel no GitHub (raw)
-file_url = "https://raw.githubusercontent.com/usuario/repositorio/branch/caminho/para/o/arquivo.xlsx"
-
 # Baixar o conteúdo do arquivo usando requests
 response = requests.get(file_url)
 
