@@ -9,10 +9,13 @@ from statsmodels.tsa.arima.model import ARIMA
 sns.set(style='whitegrid')
 
 # Caminho para o arquivo Excel
-file_path = r'C:\Python_projetos\Webscrapping_Dash_Rios\dados_rios\nivel_dos_rios_ultimos_5_anos.xlsx'
+# file_path = r'C:\Python_projetos\Webscrapping_Dash_Rios\dados_rios\nivel_dos_rios_ultimos_5_anos.xlsx'
+
+# URL do arquivo Excel no GitHub
+file_url = "https://github.com/Chitolina/dash_rios/blob/54f8fa52875a9f7f062016052d2ae6b919f99c33/dados_rios/nivel_dos_rios_ultimos_5_anos.xlsx"
 
 # Carregar os dados do Excel
-df = pd.read_excel(file_path)
+df = pd.read_excel(file_url)
 
 # Fragmentar a coluna 'Data' em colunas separadas de dia, mês e ano
 df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y')
