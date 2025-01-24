@@ -12,20 +12,23 @@ import time
 from datetime import datetime
 
 # Mapeamento de números para nomes dos meses em português
-months = {
+meses = {
     1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 
     6: 'Junho', 7: 'Julho', 8: 'Agosto', 9: 'Setembro', 
     10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
 }
 
+#  Isso aqui depende da estrutura do site, vc precisa ir inspecionando ele pra conseguir identificar o meio de extrair o dado
+
+
 def get_river_levels(driver, year, month_name):
     # Seleciona o mês
-    month_select = Select(driver.find_element(By.NAME, 'mes'))
-    month_select.select_by_visible_text(month_name)
+    selecionar_mes = Select(driver.find_element(By.NAME, 'mes'))
+    selecionar_mes.select_by_visible_text(month_name)
     
     # Seleciona o ano
-    year_select = Select(driver.find_element(By.NAME, 'ano'))
-    year_select.select_by_visible_text(str(year))
+    selecionar_ano = Select(driver.find_element(By.NAME, 'ano'))
+    selecionar_ano.select_by_visible_text(str(year))
     
     # Espera até o botão de pesquisa estar clicável e clica
     wait = WebDriverWait(driver, 10)
@@ -94,7 +97,7 @@ def main():
     try:
         for year in range(start_year, end_year + 1):
             for month in range(1, 13):
-                month_name = months[month]
+                month_name = meses[month]
                 try:
                     headers, rows = get_river_levels(driver, year, month_name)
                     data.append((headers, rows))
