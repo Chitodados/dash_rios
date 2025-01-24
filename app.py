@@ -4,18 +4,37 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
+from io import BytesIO
+
 
 # Configuração do seaborn
 sns.set(style='whitegrid')
 
-# Caminho para o arquivo Excel
+# Caminho para o arquivo Excel. Essa opção para caso o arquivo esteja em pasta local:
 # file_path = r'C:\Python_projetos\Webscrapping_Dash_Rios\dados_rios\nivel_dos_rios_ultimos_5_anos.xlsx'
+# Carregar os dados do Excel
+# df = pd.read_excel(file_url)
 
-# URL do arquivo Excel no GitHub
+
+# URL do arquivo Excel no GitHub. Essa opçao para caso o arquivo já tenha subido p github:
 file_url = "https://github.com/Chitolina/dash_rios/blob/e01c2397c837c278ffbaf3420cf9ffc6522a840c/dados_rios/nivel_dos_rios_ultimos_5_anos.xlsx"
 
-# Carregar os dados do Excel
-df = pd.read_excel(file_url)
+
+# URL do arquivo Excel no GitHub (raw)
+file_url = "https://raw.githubusercontent.com/usuario/repositorio/branch/caminho/para/o/arquivo.xlsx"
+
+# Baixar o conteúdo do arquivo usando requests
+response = requests.get(file_url)
+
+# Verificar se o download foi bem-sucedido
+if response.status_code == 200:
+    # Carregar o conteúdo do arquivo como se fosse um arquivo em memória
+    file_content = BytesIO(response.content)
+    df = pd.read_excel(file_content)
+    st.write(df)
+else:
+    st.error("Erro ao baixar o arquivo do GitHub")
+
 
 # Fragmentar a coluna 'Data' em colunas separadas de dia, mês e ano
 df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y')
