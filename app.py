@@ -8,7 +8,6 @@ from io import BytesIO
 import requests
 
 
-
 # Configuração do seaborn
 sns.set(style='whitegrid')
 
@@ -253,6 +252,13 @@ if not filtrada.empty:
 else:
     st.write("Nenhum dado disponível para os filtros selecionados.")
 
+
+st.download_button(
+    label="Baixar dados de variação",
+    data=comparison_df.to_csv(index=False).encode('utf-8'),
+    file_name=f"variacao_cota_{selected_river}.csv",
+    mime="text/csv"
+)
 
 st.markdown("---")
 
