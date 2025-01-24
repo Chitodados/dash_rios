@@ -26,7 +26,6 @@ if response.status_code == 200:
     # Carregar o conteúdo do arquivo como se fosse um arquivo em memória
     file_content = BytesIO(response.content)
     df = pd.read_excel(file_content)
-    st.write(df)
 else:
     st.error("Erro ao baixar o arquivo do GitHub")
 
