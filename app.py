@@ -5,6 +5,7 @@ import seaborn as sns
 import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 from io import BytesIO
+import requests
 
 
 # Configuração do seaborn
