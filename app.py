@@ -24,14 +24,6 @@ file_url = "https://raw.githubusercontent.com/Chitolina/dash_rios/main/dados_rio
 # Baixar o conteúdo do arquivo usando requests
 response = requests.get(file_url)
 
-# Verificar se o download foi bem-sucedido
-if response.status_code == 200:
-    # Carregar o conteúdo do arquivo como se fosse um arquivo em memória
-    file_content = BytesIO(response.content)
-    df = pd.read_excel(file_content)
-    st.write(df)
-else:
-    st.error("Erro ao baixar o arquivo do GitHub")
 
 
 # Fragmentar a coluna 'Data' em colunas separadas de dia, mês e ano
@@ -233,26 +225,27 @@ if not filtrada.empty:
                 variation_percentage = (variation_absolute / dados_ano_1) * 100 if dados_ano_1 != 0 else 0
 
                 # Adicionar dados à lista
-                # Continuando a tabela de variação mês a mês
                 comparacao.append({
                     'Mês': month,
                     'Ano Anterior': str(ano_1),
-                    'Ano Posterior': str(ano_2),
-                    'Cota Média (m) Ano Anterior': f"{dados_ano_1:.1f}",
-                    'Cota Média (m) Ano Posterior': f"{dados_ano_2:.1f}",
-                    'Variação Absoluta (m)': f"{variation_absolute:.1f}",
-                    'Variação Percentual (%)': f"{variation_percentage:.1f}" if dados_ano_1 != 0 else 'N/A'
-                    })
-                    
-                # Converter lista para DataFrame
-                comparacao_df = pd.DataFrame(comparacao)
-                
-                # Exibir a tabela no Streamlit
-                if not comparacao_df.empty:
-                    st.dataframe(comparacao_df)
-                else:
-                    st.write('Nenhuma variação disponível para os dados selecionados.')
-                st.markdown("---")
+                    'Ano Posterior': str(ano_2),  # Garantindo que o ano posterior seja exibido corretamente
+                    'Cota Média (m) Ano Anterior': f"{dados_ano_1:.1f}",  # 1 casa decimal
+                    'Cota Média (m) Ano Posterior': f"{dados_ano_2:.1f}",  # 1 casa decimal
+                    'Variação Absoluta (m)': f"{variation_absolute:.1f}",  # 1 casa decimal
+                    'Variação Percentual (%)': f"{variation_percentage:.1f}%"  # 1 casa decimal
+                })
+    
+    if comparacao:
+        comparison_df = pd.DataFrame(comparacao)
+        comparison_df = comparison_df.set_index('Mês')
+        st.dataframe(comparison_df, use_container_width=True)
+    else:
+        st.write("Nenhuma comparação válida disponível para os dados selecionados.")
+else:
+    st.write("Nenhum dado disponível para os filtros selecionados.")
+
+
+st.markdown("---")
 
 st.write("**Fonte dos Dados:** https://proamanaus.com.br/nivel-dos-rios")
 st.write("**Desenvolvido por:** [Lucas Chitolina](https://github.com/Chitolina) & [ChatGPT](https://openai.com/index/chatgpt/)")
