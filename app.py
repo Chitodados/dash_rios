@@ -18,7 +18,7 @@ sns.set(style='whitegrid')
 
 
 # URL do arquivo Excel no GitHub. Essa opçao para caso o arquivo já tenha subido p github:
-file_url = "https://github.com/Chitolina/dash_rios/blob/e01c2397c837c278ffbaf3420cf9ffc6522a840c/dados_rios/nivel_dos_rios_ultimos_5_anos.xlsx"
+file_url = "https://raw.githubusercontent.com/Chitolina/dash_rios/blob/main/dados_rios/nivel_dos_rios_ultimos_5_anos.xlsx"
 
 
 # URL do arquivo Excel no GitHub (raw)
