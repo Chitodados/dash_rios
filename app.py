@@ -246,6 +246,7 @@ if not filtrada.empty:
     if comparacao:
         comparison_df = pd.DataFrame(comparacao)
         comparison_df = comparison_df.set_index('Mês')
+        st.dataframe(comparison_df, use_container_width=True)
     else:
         st.write("Nenhuma comparação válida disponível para os dados selecionados.")
 else:
