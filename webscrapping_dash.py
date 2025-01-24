@@ -77,15 +77,15 @@ def save_data(data, filename):
         df = pd.concat([df, temp_df], ignore_index=True)
 
     # Salva em um arquivo Excel (.xlsx)
-    df.to_excel(filename, index=False, engine='openpyxl', encoding='latin1')
+    df.to_excel(filename, index=False, engine='openpyxl',)
 
 def main():
     end_year = datetime.now().year
     start_year = end_year - 5
     data = []
 
-    # Inicializa o WebDriver (certifique-se de que o caminho para o chromedriver está correto)
-    driver_path = 'C:/chromedriver-win64/chromedriver.exe'  # Atualize para o caminho correto
+    # Inicializa o WebDriver (certifique-se de que o caminho para o chromedriver está correto, se não tiver, baixe ele)
+    driver_path = 'C:\Python_projetos\chromedriver-win64\chromedriver.exe'  # Atualize para o caminho correto
     options = Options()
     service = Service(driver_path)
     driver = webdriver.Chrome(service=service, options=options)
@@ -105,7 +105,7 @@ def main():
         driver.quit()
 
     # Especificar o caminho para salvar o arquivo
-    save_path = r'M:\Planejamento\Lucas\Webscrapping_rios\nivel_dos_rios_ultimos_5_anos.xlsx'
+    save_path = r'C:\Python_projetos\Webscrapping_Dash_Rios\dados_rios\nivel_dos_rios_ultimos_5_anos.xlsx'
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     save_data(data, save_path)
 
