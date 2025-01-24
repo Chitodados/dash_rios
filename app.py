@@ -24,6 +24,14 @@ file_url = "https://raw.githubusercontent.com/Chitolina/dash_rios/main/dados_rio
 # Baixar o conteúdo do arquivo usando requests
 response = requests.get(file_url)
 
+# Verificar se o download foi bem-sucedido
+if response.status_code == 200:
+    # Carregar o conteúdo do arquivo como se fosse um arquivo em memória
+    file_content = BytesIO(response.content)
+    df = pd.read_excel(file_content)
+    st.write(df)
+else:
+    st.error("Erro ao baixar o arquivo do GitHub")
 
 
 # Fragmentar a coluna 'Data' em colunas separadas de dia, mês e ano
