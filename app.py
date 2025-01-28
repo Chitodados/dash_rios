@@ -262,5 +262,5 @@ st.download_button(
 st.markdown("---")
 
 st.write("**Fonte dos Dados:** https://proamanaus.com.br/nivel-dos-rios")
-st.write("**Desenvolvido por:** [Lucas Chitolina](https://github.com/Chitolina) & [ChatGPT](https://openai.com/index/chatgpt/)" (migrando para DeepSeek))
+st.write("**Desenvolvido por:** [Lucas Chitolina](https://github.com/Chitolina) & [ChatGPT](https://openai.com/index/chatgpt/)" "(migrando para DeepSeek)")
 
