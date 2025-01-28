@@ -3,6 +3,6 @@ pandas
 matplotlib
 seaborn
 numpy
-scikit-learn
+statsmodels
 openpyxl
 requests
