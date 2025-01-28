@@ -104,19 +104,11 @@ selected_river = st.sidebar.selectbox('Escolha a cidade/rio:', rios)
 
 # Opções de meses
 meses = list(range(1, 13))
-meses_labels = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-                "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
 meses_selecionados = st.sidebar.multiselect(
     'Escolha os meses (para a tabela):',
-    options=["Todos os meses"] + meses_labels,
+    options=["Todos os meses"] + meses,
     default=["Todos os meses"]
 )
-
-# Manter consistência entre labels e índices de meses
-if "Todos os meses" in meses_selecionados:
-    meses_selecionados = meses
-else:
-    meses_selecionados = [meses[meses_labels.index(m)] for m in meses_selecionados]
 
 # Opções de anos
 anos = sorted(df['year'].unique())
@@ -127,10 +119,10 @@ anos_selecionados = st.sidebar.multiselect(
 )
 
 # Lógica para aplicar os filtros "Todos os meses" ou "Todos os anos"
+if "Todos os meses" in meses_selecionados:
+    meses_selecionados = meses  # Todos os meses
 if "Todos os anos" in anos_selecionados:
     anos_selecionados = anos  # Todos os anos
-else:
-    anos_selecionados = [ano for ano in anos_selecionados if ano != "Todos os anos"]
 
 # Garantir que pelo menos dois anos estejam selecionados
 if len(anos_selecionados) < 2:
@@ -192,13 +184,7 @@ if not graficos.empty:
     plt.title(f'{selected_river}', fontsize=16)
     plt.xlabel('Mês', fontsize=14)
     plt.ylabel('Cota (m)', fontsize=14)
-
-    # Ajustar legenda para mostrar somente os anos selecionados
-    handles, labels = plt.gca().get_legend_handles_labels()
-    filtered_handles_labels = [(h, l) for h, l in zip(handles, labels) if any(str(ano) in l for ano in anos_selecionados)]
-    handles, labels = zip(*filtered_handles_labels) if filtered_handles_labels else ([], [])
-    plt.legend(handles, labels, title='Ano', loc='upper left')
-
+    plt.legend(title='Ano')
     st.pyplot(plt.gcf())
 else:
     st.write('Nenhum dado disponível para o gráfico.')
@@ -254,5 +240,4 @@ if 'comparison_df' in locals():
 
 st.markdown("---")
 st.write("**Fonte dos Dados:** https://proamanaus.com.br/nivel-dos-rios")
-st.write("**Desenvolvido por:** [Lucas Chitolina](https://github.com/Chitolina), [DeepSeek](https://chat.deepseek.com/) & [ChatGPT](https://chatgpt.com")
-
+st.write("**Desenvolvido por:** [Lucas Chitolina](https://github.com/Chitolina) & [DeepSeek](https://chat.deepseek.com/)")
