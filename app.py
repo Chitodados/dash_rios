@@ -7,65 +7,96 @@ from statsmodels.tsa.arima.model import ARIMA
 from io import BytesIO
 import requests
 
-
 # Configuração do seaborn
 sns.set(style='whitegrid')
 
-# Caminho para o arquivo Excel
-# file_path = r'C:\Python_projetos\Webscrapping_Dash_Rios\dados_rios\nivel_dos_rios_ultimos_5_anos.xlsx'
+# Função para carregar os dados (com cache)
+@st.cache_data
+def load_data():
+    # URL do arquivo Excel no GitHub
+    file_url = "https://raw.githubusercontent.com/Chitolina/dash_rios/main/dados_rios/nivel_dos_rios_ultimos_5_anos.xlsx"
 
-# URL do arquivo Excel no GitHub. Essa opçao para caso o arquivo já tenha subido p github:
-file_url = "https://raw.githubusercontent.com/Chitolina/dash_rios/main/dados_rios/nivel_dos_rios_ultimos_5_anos.xlsx"
+    # Baixar o conteúdo do arquivo usando requests
+    response = requests.get(file_url)
+    if response.status_code != 200:
+        st.error("Erro ao baixar o arquivo do GitHub")
+        return None
 
-
-# Baixar o conteúdo do arquivo usando requests
-response = requests.get(file_url)
-
-# Verificar se o download foi bem-sucedido
-if response.status_code == 200:
     # Carregar o conteúdo do arquivo como se fosse um arquivo em memória
     file_content = BytesIO(response.content)
     df = pd.read_excel(file_content)
-else:
-    st.error("Erro ao baixar o arquivo do GitHub")
 
+    # Fragmentar a coluna 'Data' em colunas separadas de dia, mês e ano
+    df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y')
+    df['Dia'] = df['Data'].dt.day
+    df['Mês'] = df['Data'].dt.month
+    df['Ano'] = df['Data'].dt.year.astype(int)  # Garantir que o ano seja int
 
-# Carregar os dados do Excel
-df = pd.read_excel(file_url)
+    # Melt no DataFrame para que as colunas dos rios se tornem linhas
+    df_melted = df.melt(id_vars=['Data', 'Dia', 'Mês', 'Ano'], var_name='Rio', value_name='Cota')
 
-# Fragmentar a coluna 'Data' em colunas separadas de dia, mês e ano
-df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y')
-df['Dia'] = df['Data'].dt.day
-df['Mês'] = df['Data'].dt.month
-df['Ano'] = df['Data'].dt.year.astype(int)  # Garantir que o ano seja int
+    # Filtrar as linhas para manter apenas as linhas com valores de cota
+    df_melted = df_melted.dropna(subset=['Cota'])
 
-# Melt no DataFrame para que as colunas dos rios se tornem linhas
-df_melted = df.melt(id_vars=['Data', 'Dia', 'Mês', 'Ano'], var_name='Rio', value_name='Cota')
+    # Remover a coluna 'Data' já que temos dia, mês e ano
+    df_melted = df_melted.drop(columns=['Data'])
 
-# Filtrar as linhas para manter apenas as linhas com valores de cota
-df_melted = df_melted.dropna(subset=['Cota'])
+    df_melted = df_melted[['Ano', 'Mês', 'Dia', 'Rio', 'Cota']].rename(
+        columns={'Rio': 'rio', 'Ano': 'year', 'Mês': 'month', 'Dia': 'day', 'Cota': 'altura'}
+    )
 
-# Remover a coluna 'Data' já que temos dia, mês e ano
-df_melted = df_melted.drop(columns=['Data'])
+    df = df_melted.copy().fillna(0)
 
-df_melted = df_melted[['Ano', 'Mês', 'Dia', 'Rio', 'Cota']].rename(columns={'Rio': 'rio', 'Ano': 'year', 'Mês': 'month', 'Dia': 'day', 'Cota': 'altura'})
+    # Filtrar rios indesejados, pq em alguns anos não têm dados
+    df = df.loc[~df['rio'].isin(['Stº. Ant. Içá', 'Iquitos', 'Coari'])]
 
-df = df_melted.copy().fillna(0)
+    # Ajustar nomes dos rios
+    dic = {
+        'Tabatinga': 'Tabatinga: Solimões',
+        'Itacoatiara': 'Itacoatiara: Rio Amazonas',
+        'Manaus': 'Manaus: Rio Amazonas'
+    }
+    df['rio'] = df['rio'].replace(dic)
 
-# Filtrar rios indesejados, pq em alguns anos não têm dados
-df = df.loc[~df['rio'].isin(['Stº. Ant. Içá', 'Iquitos', 'Coari'])]
+    return df
 
-# Ajustar nomes dos rios
-dic = {
-    'Tabatinga': 'Tabatinga: Solimões',
-    'Itacoatiara': 'Itacoatiara: Rio Amazonas',
-    'Manaus': 'Manaus: Rio Amazonas'
-}
-df['rio'] = df['rio'].replace(dic)
+# Carregar os dados
+df = load_data()
 
+# Função para prever o valor do ARIMA para cada rio (com cache)
+@st.cache_data
+def forecast_arima(rio_data, months_to_predict=12):
+    # Usar ARIMA para prever
+    model = ARIMA(rio_data, order=(1, 1, 1))
+    model_fit = model.fit()
+    forecast = model_fit.forecast(steps=months_to_predict)
+    return forecast
 
+# Realizando a previsão para o ano de 2025 (com cache)
+@st.cache_data
+def get_2025_forecast(df):
+    df_2025_forecast = pd.DataFrame()
 
+    for rio in df['rio'].unique():
+        for month in range(1, 13):
+            # Filtrar dados históricos para cada rio e mês
+            rio_month_data = df[(df['rio'] == rio) & (df['month'] == month) & (df['year'] < 2025)]
+            if not rio_month_data.empty:
+                # Prever os valores para 2025
+                forecast_values = forecast_arima(rio_month_data['altura'])
+                forecast_df = pd.DataFrame({
+                    'year': [2025] * len(forecast_values),
+                    'month': [month] * len(forecast_values),
+                    'rio': [rio] * len(forecast_values),
+                    'altura': forecast_values  # Use 'altura' para manter a consistência
+                })
+                df_2025_forecast = pd.concat([df_2025_forecast, forecast_df], ignore_index=True)
 
+    return df_2025_forecast
+
+# Concatenando os dados históricos e a previsão para 2025
+df_2025_forecast = get_2025_forecast(df)
+df_concat = pd.concat([df, df_2025_forecast])
 
 # Opções de rios
 rios = df['rio'].unique()
@@ -74,22 +105,18 @@ selected_river = st.sidebar.selectbox('Escolha a cidade/rio:', rios)
 # Opções de meses
 meses = list(range(1, 13))
 meses_selecionados = st.sidebar.multiselect(
-    'Escolha os meses (para a tabela):', 
-    options=["Todos os meses"] + meses, 
+    'Escolha os meses (para a tabela):',
+    options=["Todos os meses"] + meses,
     default=["Todos os meses"]
 )
 
 # Opções de anos
 anos = sorted(df['year'].unique())
 anos_selecionados = st.sidebar.multiselect(
-    'Escolha os anos para comparar:', 
-    options=["Todos os anos"] + anos, 
+    'Escolha os anos para comparar:',
+    options=["Todos os anos"] + anos,
     default=["Todos os anos"]
 )
-
-
-
-
 
 # Lógica para aplicar os filtros "Todos os meses" ou "Todos os anos"
 if "Todos os meses" in meses_selecionados:
@@ -97,66 +124,22 @@ if "Todos os meses" in meses_selecionados:
 if "Todos os anos" in anos_selecionados:
     anos_selecionados = anos  # Todos os anos
 
-
-
-
-
 # Garantir que pelo menos dois anos estejam selecionados
 if len(anos_selecionados) < 2:
     st.warning('Por favor, selecione pelo menos dois anos para realizar a comparação.')
     st.stop()
-
-# Função para prever o valor do ARIMA para cada rio. Arima é o método de previsão de dados que usarei pro ano de 2025
-def forecast_arima(rio_data, months_to_predict=12):
-    # Usar ARIMA para prever
-    model = ARIMA(rio_data, order=(1, 1, 1))  
-    model_fit = model.fit()
-    forecast = model_fit.forecast(steps=months_to_predict)
-    return forecast
-
-
-
-
-
-
-
-# Realizando a previsão para o ano de 2025
-df_2025_forecast = pd.DataFrame()
-
-for rio in df['rio'].unique():
-    for month in range(1, 13):
-        # Filtrar dados históricos para cada rio e mês
-        rio_month_data = df[(df['rio'] == rio) & (df['month'] == month) & (df['year'] < 2025)]
-        if not rio_month_data.empty:
-            # Prever os valores para 2025
-            forecast_values = forecast_arima(rio_month_data['altura'])
-            forecast_df = pd.DataFrame({
-                'year': [2025] * len(forecast_values),
-                'month': [month] * len(forecast_values),
-                'rio': [rio] * len(forecast_values),
-                'Previsão': forecast_values
-            })
-            df_2025_forecast = pd.concat([df_2025_forecast, forecast_df], ignore_index=True)
-
-# Concatenando os dados históricos e a previsão para 2025
-df_concat = pd.concat([df, df_2025_forecast])
 
 # Filtrar os dados para o gráfico
 graficos = df_concat[(df_concat['rio'] == selected_river) & (df_concat['year'].isin(anos_selecionados))]
 
 # Filtrar os dados para a tabela
 filtrada = df[
-    (df['rio'] == selected_river) & 
-    (df['year'].isin(anos_selecionados)) & 
+    (df['rio'] == selected_river) &
+    (df['year'].isin(anos_selecionados)) &
     (df['month'].isin(meses_selecionados))
 ]
 
-
-
-
-
 # Estilização do dash
-
 st.markdown("""
 <style>
 /* Fundo geral */
@@ -187,12 +170,7 @@ h1, h2, h3, h4, h5, h6 {
 </style>
 """, unsafe_allow_html=True)
 
-
-
-
 # Gráfico com a evolução das cotas
-
-
 st.markdown("### Evolução da cota ao longo dos meses e anos")
 if not graficos.empty:
     plt.figure(figsize=(12, 6))
@@ -201,7 +179,7 @@ if not graficos.empty:
     sns.lineplot(data=graficos[graficos['year'] != 2025], x='month', y='altura', hue='year', style='year', markers=True, dashes=False, palette='viridis')
 
     # Gráfico para os dados de previsão (2025) - linha pontilhada
-    sns.lineplot(data=graficos[graficos['year'] == 2025], x='month', y='Previsão', color='red', linestyle='--', label='Previsão 2025')
+    sns.lineplot(data=graficos[graficos['year'] == 2025], x='month', y='altura', color='red', linestyle='--', label='Previsão 2025')
 
     plt.title(f'{selected_river}', fontsize=16)
     plt.xlabel('Mês', fontsize=14)
@@ -220,11 +198,11 @@ if not filtrada.empty:
         for i in range(1, len(anos_selecionados_sorted)):
             ano_1 = anos_selecionados_sorted[i - 1]
             ano_2 = anos_selecionados_sorted[i]
-            
+
             # Calcular médias
             dados_ano_1 = filtrada[(filtrada['year'] == ano_1) & (filtrada['month'] == month)]['altura'].mean()
             dados_ano_2 = filtrada[(filtrada['year'] == ano_2) & (filtrada['month'] == month)]['altura'].mean()
-            
+
             # Verificar se há valores válidos para os anos comparados
             if pd.notna(dados_ano_1) and pd.notna(dados_ano_2):
                 # Calcular variações
@@ -235,13 +213,13 @@ if not filtrada.empty:
                 comparacao.append({
                     'Mês': month,
                     'Ano Anterior': str(ano_1),
-                    'Ano Posterior': str(ano_2),  # Garantindo que o ano posterior seja exibido corretamente
-                    'Cota Média (m) Ano Anterior': f"{dados_ano_1:.1f}",  # 1 casa decimal
-                    'Cota Média (m) Ano Posterior': f"{dados_ano_2:.1f}",  # 1 casa decimal
-                    'Variação Absoluta (m)': f"{variation_absolute:.1f}",  # 1 casa decimal
-                    'Variação Percentual (%)': f"{variation_percentage:.1f}%"  # 1 casa decimal
+                    'Ano Posterior': str(ano_2),
+                    'Cota Média (m) Ano Anterior': f"{dados_ano_1:.1f}",
+                    'Cota Média (m) Ano Posterior': f"{dados_ano_2:.1f}",
+                    'Variação Absoluta (m)': f"{variation_absolute:.1f}",
+                    'Variação Percentual (%)': f"{variation_percentage:.1f}%"
                 })
-    
+
     if comparacao:
         comparison_df = pd.DataFrame(comparacao)
         comparison_df = comparison_df.set_index('Mês')
@@ -251,16 +229,15 @@ if not filtrada.empty:
 else:
     st.write("Nenhum dado disponível para os filtros selecionados.")
 
-
-st.download_button(
-    label="Baixar dados de variação",
-    data=comparison_df.to_csv(index=False).encode('utf-8'),
-    file_name=f"variacao_cota_{selected_river}.csv",
-    mime="text/csv"
-)
+# Botão para baixar os dados de variação
+if 'comparison_df' in locals():
+    st.download_button(
+        label="Baixar dados de variação",
+        data=comparison_df.to_csv(index=False).encode('utf-8'),
+        file_name=f"variacao_cota_{selected_river}.csv",
+        mime="text/csv"
+    )
 
 st.markdown("---")
-
 st.write("**Fonte dos Dados:** https://proamanaus.com.br/nivel-dos-rios")
-st.write("**Desenvolvido por:** [Lucas Chitolina](https://github.com/Chitolina) & [ChatGPT](https://openai.com/index/chatgpt/)" "(migrando para DeepSeek)")
-
+st.write("**Desenvolvido por:** [Lucas Chitolina](https://github.com/Chitolina) & [DeepSeek](https://chat.deepseek.com/)")
