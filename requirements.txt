@@ -1,7 +1,8 @@
-pandas
 streamlit
+pandas
 matplotlib
 seaborn
+numpy
+scikit-learn
 openpyxl
-statsmodels
 requests
