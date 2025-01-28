@@ -178,8 +178,9 @@ if not graficos.empty:
     # Gráfico para os dados históricos
     sns.lineplot(data=graficos[graficos['year'] != 2025], x='month', y='altura', hue='year', style='year', markers=True, dashes=False, palette='viridis')
 
-    # Gráfico para os dados de previsão (2025) - linha pontilhada
-    sns.lineplot(data=graficos[graficos['year'] == 2025], x='month', y='altura', color='red', linestyle='--', label='Previsão 2025')
+    # Verificar se 2025 está nos anos selecionados ou se "Todos os anos" foi selecionado
+    if 2025 in anos_selecionados or "Todos os anos" in anos_selecionados:
+        sns.lineplot(data=graficos[graficos['year'] == 2025], x='month', y='altura', color='red', linestyle='--', label='Previsão 2025')
 
     plt.title(f'{selected_river}', fontsize=16)
     plt.xlabel('Mês', fontsize=14)
@@ -188,6 +189,7 @@ if not graficos.empty:
     st.pyplot(plt.gcf())
 else:
     st.write('Nenhum dado disponível para o gráfico.')
+
 
 # Tabela de variação mês a mês
 st.markdown("### Tabela de Variação de Cota Média")
