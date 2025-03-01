@@ -17,7 +17,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y chromium-browser chromium-chromedriver
-          pip install -r requirements.txt  # Certifique-se de que tem este arquivo no repositório
+          sudo apt-get install -y wget
+          wget -q -O - https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb | sudo dpkg -i -
+          sudo apt-get install -f  # Corrigir dependências
 
       - name: Rodar o script de web scraping
         run: python webscrapping_dash_githubactions.py
