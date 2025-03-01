@@ -29,8 +29,8 @@ jobs:
           source venv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt  # Caso você tenha um arquivo requirements.txt
-          # Ou instale pandas diretamente se não tiver um requirements.txt
-          pip install pandas
+          # Ou instale pandas e beautifulsoup4 diretamente
+          pip install pandas beautifulsoup4
 
       - name: Rodar o script de web scraping
         run: |
