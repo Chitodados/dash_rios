@@ -13,12 +13,14 @@ jobs:
       - name: Clonar o repositório
         uses: actions/checkout@v4
 
-      - name: Instalar dependências
+      - name: Instalar o Chromium e o ChromeDriver
         run: |
           sudo apt-get update
           sudo apt-get install -y chromium-browser chromium-chromedriver
           sudo apt-get install -y wget
-          wget -q -O - https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb | sudo dpkg -i -
+          # Baixar e instalar o Google Chrome
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo dpkg -i google-chrome-stable_current_amd64.deb
           sudo apt-get install -f  # Corrigir dependências
 
       - name: Rodar o script de web scraping
