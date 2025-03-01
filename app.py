@@ -28,52 +28,46 @@ sns.set(style='whitegrid')
 # Função para carregar os dados (com cache)
 @st.cache_data
 def load_data():
-    # URL do arquivo Excel no GitHub
-    file_url = "https://raw.githubusercontent.com/Chitolina/dash_rios/main/dados_rios/nivel_dos_rios_ultimos_5_anos.xlsx"
+    # Caminho para o arquivo CSV
+    file_path = "nivel_dos_rios.csv"  # Atualize o caminho conforme necessário
 
-    # Baixar o conteúdo do arquivo usando requests
-    response = requests.get(file_url)
-    if response.status_code != 200:
-        st.error("Erro ao baixar o arquivo do GitHub")
+    # Verificar se o arquivo existe e ler os dados
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
+
+        # Verificar se o arquivo é mais recente do que o cache
+        file_mod_time = datetime.fromtimestamp(os.path.getmtime(file_path))
+        if file_mod_time > datetime.now() - pd.Timedelta(hours=1):  # Atualizar o cache a cada hora, por exemplo
+            st.cache_clear()  # Forçar a limpeza do cache para recarregar os dados
+
+        # Manipulação dos dados (igual ao código original)
+        df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y')
+        df['Dia'] = df['Data'].dt.day
+        df['Mês'] = df['Data'].dt.month
+        df['Ano'] = df['Data'].dt.year.astype(int)
+
+        # Melt no DataFrame para que as colunas dos rios se tornem linhas
+        df_melted = df.melt(id_vars=['Data', 'Dia', 'Mês', 'Ano'], var_name='Rio', value_name='Cota')
+        df_melted = df_melted.dropna(subset=['Cota'])
+
+        df_melted = df_melted[['Ano', 'Mês', 'Dia', 'Rio', 'Cota']].rename(
+            columns={'Rio': 'rio', 'Ano': 'year', 'Mês': 'month', 'Dia': 'day', 'Cota': 'altura'}
+        )
+
+        df = df_melted.copy().fillna(0)
+        df = df.loc[~df['rio'].isin(['Stº. Ant. Içá', 'Iquitos', 'Coari'])]
+
+        dic = {
+            'Tabatinga': 'Tabatinga: Solimões',
+            'Itacoatiara': 'Itacoatiara: Rio Amazonas',
+            'Manaus': 'Manaus: Rio Amazonas'
+        }
+        df['rio'] = df['rio'].replace(dic)
+
+        return df
+    else:
+        st.error("Arquivo CSV não encontrado.")
         return None
-
-    # Carregar o conteúdo do arquivo como se fosse um arquivo em memória
-    file_content = BytesIO(response.content)
-    df = pd.read_excel(file_content)
-
-    # Fragmentar a coluna 'Data' em colunas separadas de dia, mês e ano
-    df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y')
-    df['Dia'] = df['Data'].dt.day
-    df['Mês'] = df['Data'].dt.month
-    df['Ano'] = df['Data'].dt.year.astype(int)  # Garantir que o ano seja int
-
-    # Melt no DataFrame para que as colunas dos rios se tornem linhas
-    df_melted = df.melt(id_vars=['Data', 'Dia', 'Mês', 'Ano'], var_name='Rio', value_name='Cota')
-
-    # Filtrar as linhas para manter apenas as linhas com valores de cota
-    df_melted = df_melted.dropna(subset=['Cota'])
-
-    # Remover a coluna 'Data' já que temos dia, mês e ano
-    df_melted = df_melted.drop(columns=['Data'])
-
-    df_melted = df_melted[['Ano', 'Mês', 'Dia', 'Rio', 'Cota']].rename(
-        columns={'Rio': 'rio', 'Ano': 'year', 'Mês': 'month', 'Dia': 'day', 'Cota': 'altura'}
-    )
-
-    df = df_melted.copy().fillna(0)
-
-    # Filtrar rios indesejados, pq em alguns anos não têm dados
-    df = df.loc[~df['rio'].isin(['Stº. Ant. Içá', 'Iquitos', 'Coari'])]
-
-    # Ajustar nomes dos rios
-    dic = {
-        'Tabatinga': 'Tabatinga: Solimões',
-        'Itacoatiara': 'Itacoatiara: Rio Amazonas',
-        'Manaus': 'Manaus: Rio Amazonas'
-    }
-    df['rio'] = df['rio'].replace(dic)
-
-    return df
 
 # Carregar os dados
 df = load_data()
@@ -81,7 +75,6 @@ df = load_data()
 # Função para prever o valor do ARIMA para cada rio (com cache)
 @st.cache_data
 def forecast_arima(rio_data, months_to_predict=12):
-    # Usar ARIMA para prever
     model = ARIMA(rio_data, order=(1, 1, 1))
     model_fit = model.fit()
     forecast = model_fit.forecast(steps=months_to_predict)
