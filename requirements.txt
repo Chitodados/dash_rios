@@ -7,4 +7,4 @@ statsmodels
 openpyxl
 requests
 selenium>=4.0.0
-chromium-chromedriver
+chromedriver-autoinstaller
