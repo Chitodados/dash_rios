@@ -4,6 +4,12 @@ Created on Sat Mar  1 17:54:16 2025
 
 @author: lucas
 """
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Mar  1 17:54:16 2025
+
+@author: lucas
+"""
 
 import os
 import time
@@ -19,7 +25,6 @@ from selenium.webdriver.support.ui import Select
 from bs4 import BeautifulSoup
 import chromedriver_autoinstaller
 import time
-from selenium import webdriver
 
 # Instalar o chromedriver automaticamente
 chromedriver_autoinstaller.install()
@@ -34,19 +39,24 @@ meses = {1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio',
 
 # Função para extrair os dados do site
 def get_river_levels(driver, year, month_name):
+    # Selecionar o mês
     selecionar_mes = Select(driver.find_element(By.NAME, 'mes'))
     selecionar_mes.select_by_visible_text(month_name)
 
+    # Selecionar o ano
     selecionar_ano = Select(driver.find_element(By.NAME, 'ano'))
     selecionar_ano.select_by_visible_text(str(year))
 
+    # Esperar até o botão de pesquisa estar clicável e clicar
     wait = WebDriverWait(driver, 10)
     search_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "input.bt-submit[type='submit'][value='Pesquisar']")))
     search_button.click()
 
-    time.sleep(5)
+    time.sleep(5)  # Esperar a página carregar
 
-    soup = BeautifulSoup(.page_source, 'html.parser')
+    # Corrigir a linha do BeautifulSoup
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+
     tbody = soup.select_one('body > main > div > article > div > table > tbody')
 
     if not tbody:
@@ -86,12 +96,13 @@ def main():
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
 
-    service = Service("/usr/bin/chrome")  # Caminho do chrome no Linux
+    # Iniciar o driver
     driver = webdriver.Chrome(options=options)
 
     driver.get('https://proamanaus.com.br/nivel-dos-rios')
 
     try:
+        # Iterar pelos anos e meses
         for year in range(start_year, end_year + 1):
             for month in range(1, 13):
                 month_name = meses[month]
@@ -104,9 +115,10 @@ def main():
     finally:
         driver.quit()
 
-    # Salvar o CSV na pasta do repositório
+    # Salvar os dados coletados no CSV
     save_path = "nivel_dos_rios.csv"
     save_data(data, save_path)
 
 if __name__ == "__main__":
     main()
+
