@@ -17,6 +17,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 from bs4 import BeautifulSoup
+import chromedriver_autoinstaller
+import time
+from selenium import webdriver
+
+# Instalar o chromedriver automaticamente
+chromedriver_autoinstaller.install()
+
+# Configurar o Selenium com o Chrome
+options = webdriver.ChromeOptions()
+options.add_argument('--headless')  # Opcional: rodar sem abrir uma janela do navegador
 
 # Dicionário de meses em português
 meses = {1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 5: 'Maio', 
@@ -36,7 +46,7 @@ def get_river_levels(driver, year, month_name):
 
     time.sleep(5)
 
-    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    soup = BeautifulSoup(.page_source, 'html.parser')
     tbody = soup.select_one('body > main > div > article > div > table > tbody')
 
     if not tbody:
@@ -76,8 +86,9 @@ def main():
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
 
-    service = Service("/usr/bin/chromedriver")  # Caminho do chromedriver no Linux
-    driver = webdriver.Chrome(service=service, options=options)
+    service = Service("/usr/bin/chrome")  # Caminho do chrome no Linux
+    driver = webdriver.Chrome(options=options)
+
     driver.get('https://proamanaus.com.br/nivel-dos-rios')
 
     try:
