@@ -6,3 +6,5 @@ numpy
 statsmodels
 openpyxl
 requests
+selenium
+chromium-chromedriver
