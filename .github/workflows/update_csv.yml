@@ -8,71 +8,25 @@ on:
 jobs:
   update_csv:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Instalar dependências do sistema
+      - name: Clonar o repositório
+        uses: actions/checkout@v4
+
+      - name: Instalar dependências
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget curl unzip python3-venv python3-pip libxss1 libappindicator3-1 libindicator7
-          
-          # Forçar correção de pacotes quebrados
-          sudo dpkg --configure -a
-          sudo apt-get install -f -y
-          sudo apt-get autoremove -y
-          sudo apt-get clean
-
-      - name: Verificar serviços e reiniciar
-        run: |
-          sudo systemctl restart ModemManager.service
-          sudo systemctl restart docker.service
-          sudo systemctl restart networkd-dispatcher.service
-          sudo systemctl restart runner-provisioner.service
-          sudo systemctl restart systemd-logind.service
-
-      - name: Instalar Google Chrome e ChromeDriver
-        run: |
-          wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get install -f -y
-          CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9.]+' | head -1)
-          CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
-          wget -q "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
-          unzip chromedriver_linux64.zip
-          sudo mv chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
-
-      - name: Configurar Python e instalar dependências
-        run: |
-          python -m venv venv  # Criar ambiente virtual
-          source venv/bin/activate
-          pip install --upgrade pip
-          
-          # Instalar dependências do projeto
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          else
-            pip install pandas beautifulsoup4 selenium
-          fi
-          
-          # Verificar se as dependências foram instaladas corretamente
-          pip list
+          sudo apt-get install -y chromium-browser chromium-chromedriver
+          pip install -r requirements.txt
 
       - name: Rodar o script de web scraping
-        run: |
-          source venv/bin/activate
-          which python  # Verifica se o Python do venv está ativado
-          python webscrapping_dash_githubactions.py
+        run: python webscrapping_dash_githubactions.py
 
       - name: Commitar e enviar o CSV atualizado
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add nivel_dos_rios.csv
-          
-          # Verifica se há mudanças antes de tentar commitar
-          if git diff --cached --quiet; then
-            echo "Nenhuma alteração detectada no CSV. Saindo..."
-            exit 0
-          fi
-
           git commit -m "Atualização automática do CSV"
           git push
         env:
