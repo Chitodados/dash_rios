@@ -6,18 +6,19 @@ import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 from io import BytesIO
 import requests
+import os
+from datetime import datetime
 
 st.markdown("""
     # Monitoramento e Previsão dos Níveis de Água dos Rios
 
     **Cenário:**
 
-    Sua empresa importa produtos por portos ligados a rios estratégicos. Alguns desses produtos possuem alta sazonalidade de venda no verão. No entanto, existe um histórico de redução significativa na cota dos rios devido à seca, o que pode inviabilizar o transporte por algumas rotas. Diante disso, é essencial monitorar os níveis de água dos rios e projetar tendências futuras para antecipar decisões estratégicas e mitigar riscos
+    Sua empresa importa produtos por portos ligados a rios estratégicos. Alguns desses produtos possuem alta sazonalidade de venda no verão. No entanto, existe um histórico de redução significativa na cota dos rios devido à seca, o que pode inviabilizar o transporte por algumas rotas. Diante disso, é essencial monitorar os níveis de água dos rios e projetar tendências futuras para antecipar decisões estratégicas e mitigar riscos.
 
     **Processo proposto:**
 
     - **Coleta de dados:** Extração automática ([web scraping](https://github.com/Chitolina/dash_rios/blob/main/webscrapping_dash.py/)) de informações brutas de uma fonte confiável ([Proama Amazonas](https://proamanaus.com.br/nivel-dos-rios/));
-    - **MPipeline de dados:** Depois do webscrapping, criou-se um workflow para extrair e atualizar no github todo dia, via GitHub Actions;
     - **Manipulação e análise:** Processamento dos dados, criação de gráficos informativos e automação das análises utilizando Python;
     - **Projeção futura:** Aplicação de modelos de séries temporais, como ARIMA, para prever os níveis futuros dos rios;
     - **Deploy dinâmico:** Disponibilização das análises e previsões em uma plataforma mais intuitiva e acessível, como um dashboard interativo.
@@ -26,9 +27,6 @@ st.markdown("""
 # Configuração do seaborn
 sns.set(style='whitegrid')
 
-import os  
-from datetime import datetime
-
 # Função para carregar os dados (com cache)
 @st.cache_data
 def load_data():
@@ -36,11 +34,11 @@ def load_data():
     file_path = "nivel_dos_rios.csv"  # Atualize o caminho conforme necessário
 
     # Verificar se o arquivo existe e ler os dados
-    if os.path.exists(file_path):  # Certifique-se de que o módulo os está importado
+    if os.path.exists(file_path):
         df = pd.read_csv(file_path)
 
         # Verificar se o arquivo é mais recente do que o cache
-        file_mod_time = datetime.fromtimestamp(os.path.getmtime(file_path))  # Certifique-se de que datetime está importado
+        file_mod_time = datetime.fromtimestamp(os.path.getmtime(file_path))
         if file_mod_time > datetime.now() - pd.Timedelta(hours=1):  # Atualizar o cache a cada hora, por exemplo
             st.cache_clear()  # Forçar a limpeza do cache para recarregar os dados
 
