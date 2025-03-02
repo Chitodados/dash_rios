@@ -5,8 +5,6 @@ import seaborn as sns
 import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 from io import BytesIO
-from datetime import datetime
-
 import requests
 
 st.markdown("""
@@ -182,31 +180,17 @@ h1, h2, h3, h4, h5, h6 {
 """, unsafe_allow_html=True)
 
 # Gráfico com a evolução das cotas
-# Gráfico com a evolução das cotas
-# Gráfico com a evolução das cotas
-
-# Obter a data atual
-data_atual = datetime.now()
-
-# Gráfico com a evolução das cotas
 st.markdown("### Evolução da cota ao longo dos meses e anos")
 if not graficos.empty:
     plt.figure(figsize=(12, 6))
 
-    # Filtrar dados de 2025 até o mês atual (dados reais)
-    dados_reais_2025 = graficos[(graficos['year'] == 2025) & (graficos['month'] <= data_atual.month)]  # Dados reais até o mês atual
-    if not dados_reais_2025.empty:
-        sns.lineplot(data=dados_reais_2025, x='month', y='altura', color='blue', label='Dados reais 2025', linestyle='-', linewidth=2, markers=True)
-
-    # Filtrar dados de 2025 a partir do mês seguinte ao atual (previsões)
-    previsao_2025 = graficos[(graficos['year'] == 2025) & (graficos['month'] > data_atual.month)]  # Previsões após o mês atual
-    if not previsao_2025.empty:
-        sns.lineplot(data=previsao_2025, x='month', y='altura', color='red', label='Previsão 2025', linestyle='--', linewidth=2, markers=True)
-
-    # Plotar os dados históricos para os outros anos
+    # Gráfico para os dados históricos
     sns.lineplot(data=graficos[graficos['year'] != 2025], x='month', y='altura', hue='year', style='year', markers=True, dashes=False, palette='viridis')
 
-    # Ajuste do título e eixos
+    # Verificar se 2025 está nos anos selecionados ou se "Todos os anos" foi selecionado
+    if 2025 in anos_selecionados or "Todos os anos" in anos_selecionados:
+        sns.lineplot(data=graficos[graficos['year'] == 2025], x='month', y='altura', color='red', linestyle='--', label='Previsão 2025')
+
     plt.title(f'{selected_river}', fontsize=16)
     plt.xlabel('Mês', fontsize=14)
     plt.ylabel('Cota (m)', fontsize=14)
@@ -268,3 +252,5 @@ if 'comparison_df' in locals():
 st.markdown("---")
 st.write("**Fonte dos Dados:** https://proamanaus.com.br/nivel-dos-rios")
 st.write("**Desenvolvido por:** [Lucas Chitolina¹](https://github.com/Chitolina), [Lucas Chitolina²](https://chitolina.github.io), [DeepSeek](https://chat.deepseek.com/) & [ChatGPT](https://chatgpt.com)")
+
+Eu queria que pro ano de 2025 mostrasse na linha os dados que já temos e fizesse a previsão apenas dos dados de datas que ainda estão por vir, entendeu
