@@ -17,6 +17,7 @@ st.markdown("""
     **Processo proposto:**
 
     - **Coleta de dados:** Extração automática ([web scraping](https://github.com/Chitolina/dash_rios/blob/main/webscrapping_dash.py/)) de informações brutas de uma fonte confiável ([Proama Amazonas](https://proamanaus.com.br/nivel-dos-rios/));
+    - **Atualização automática:** Criada uma pipeline para executar o webscrapping diariamente e atualizar o dado no repositório via Github Actions;
     - **Manipulação e análise:** Processamento dos dados, criação de gráficos informativos e automação das análises utilizando Python;
     - **Projeção futura:** Aplicação de modelos de séries temporais, como ARIMA, para prever os níveis futuros dos rios;
     - **Deploy dinâmico:** Disponibilização das análises e previsões em uma plataforma mais intuitiva e acessível, como um dashboard interativo.
