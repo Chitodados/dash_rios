@@ -182,17 +182,23 @@ h1, h2, h3, h4, h5, h6 {
 # Gráfico com a evolução das cotas
 # Gráfico com a evolução das cotas
 # Gráfico com a evolução das cotas
+from datetime import datetime
+
+# Obter a data atual
+data_atual = datetime.now()
+
+# Gráfico com a evolução das cotas
 st.markdown("### Evolução da cota ao longo dos meses e anos")
 if not graficos.empty:
     plt.figure(figsize=(12, 6))
 
-    # Plotar dados históricos (até o mês atual de 2025)
-    dados_historicos_2025 = graficos[(graficos['year'] == 2025) & (graficos['month'] <= 12)]  # Dados históricos de 2025 até dezembro
-    if not dados_historicos_2025.empty:
-        sns.lineplot(data=dados_historicos_2025, x='month', y='altura', color='blue', label='Dados de 2025', linestyle='-', linewidth=2, markers=True)
+    # Filtrar dados de 2025 até o mês atual (dados reais)
+    dados_reais_2025 = graficos[(graficos['year'] == 2025) & (graficos['month'] <= data_atual.month)]  # Dados reais até o mês atual
+    if not dados_reais_2025.empty:
+        sns.lineplot(data=dados_reais_2025, x='month', y='altura', color='blue', label='Dados reais 2025', linestyle='-', linewidth=2, markers=True)
 
-    # Plotar previsões (após dezembro de 2025)
-    previsao_2025 = graficos[(graficos['year'] == 2025) & (graficos['month'] > 12)]  # Previsões após dezembro de 2025
+    # Filtrar dados de 2025 a partir do mês seguinte ao atual (previsões)
+    previsao_2025 = graficos[(graficos['year'] == 2025) & (graficos['month'] > data_atual.month)]  # Previsões após o mês atual
     if not previsao_2025.empty:
         sns.lineplot(data=previsao_2025, x='month', y='altura', color='red', label='Previsão 2025', linestyle='--', linewidth=2, markers=True)
 
