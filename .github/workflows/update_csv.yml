@@ -13,28 +13,27 @@ jobs:
       - name: Clonar o repositório
         uses: actions/checkout@v4
 
-      - name: Instalar o Chromium e o ChromeDriver
+      - name: Instalar Google Chrome e ChromeDriver
         run: |
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser chromium-chromedriver
-          sudo apt-get install -y wget
-          # Baixar e instalar o Google Chrome
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome-stable_current_amd64.deb
-          sudo apt-get install -f  # Corrigir dependências
+          wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get -fy install
+          CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9.]+' | head -1)
+          CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
+          wget -q "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/
+          sudo chmod +x /usr/local/bin/chromedriver
 
       - name: Configurar Python e instalar dependências
         run: |
           python -m venv venv  # Cria um ambiente virtual
           source venv/bin/activate
           pip install --upgrade pip
-          pip install -r requirements.txt  # Caso você tenha um arquivo requirements.txt
-          # Ou instale pandas e beautifulsoup4 diretamente
-          pip install pandas beautifulsoup4
+          pip install -r requirements.txt || pip install pandas beautifulsoup4 selenium
 
       - name: Rodar o script de web scraping
         run: |
-          source venv/bin/activate  # Ativa o ambiente virtual
+          source venv/bin/activate
           python webscrapping_dash_githubactions.py
 
       - name: Commitar e enviar o CSV atualizado
@@ -42,6 +41,13 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add nivel_dos_rios.csv
+          
+          # Verifica se há mudanças antes de tentar commitar
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração detectada no CSV. Saindo."
+            exit 0
+          fi
+
           git commit -m "Atualização automática do CSV"
           git push
         env:
