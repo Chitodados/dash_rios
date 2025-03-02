@@ -27,7 +27,7 @@ st.markdown("""
 sns.set(style='whitegrid')
 
 # Função para carregar os dados (com cache)
-@st.cache_data
+#@st.cache_data
 def load_data():
     # Caminho para o arquivo CSV
     file_path = "nivel_dos_rios.csv"  # Atualize o caminho conforme necessário
