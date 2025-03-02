@@ -253,4 +253,3 @@ st.markdown("---")
 st.write("**Fonte dos Dados:** https://proamanaus.com.br/nivel-dos-rios")
 st.write("**Desenvolvido por:** [Lucas Chitolina¹](https://github.com/Chitolina), [Lucas Chitolina²](https://chitolina.github.io), [DeepSeek](https://chat.deepseek.com/) & [ChatGPT](https://chatgpt.com)")
 
-Eu queria que pro ano de 2025 mostrasse na linha os dados que já temos e fizesse a previsão apenas dos dados de datas que ainda estão por vir, entendeu
