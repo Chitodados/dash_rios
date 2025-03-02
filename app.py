@@ -187,9 +187,20 @@ if not graficos.empty:
     # Gráfico para os dados históricos
     sns.lineplot(data=graficos[graficos['year'] != 2025], x='month', y='altura', hue='year', style='year', markers=True, dashes=False, palette='viridis')
 
-    # Verificar se 2025 está nos anos selecionados ou se "Todos os anos" foi selecionado
+    # Filtrar os dados de 2025 (históricos e previstos)
+    data_2025 = graficos[graficos['year'] == 2025]
+    for month in range(1, 13):
+        # Verificar se já existe dado para o mês de 2025
+        if data_2025[data_2025['month'] == month].empty:
+            # Se não existe dado, fazer a previsão para esse mês
+            forecast_value = df_2025_forecast[(df_2025_forecast['year'] == 2025) & (df_2025_forecast['month'] == month)]['altura'].values
+            if forecast_value.size > 0:
+                # Adicionar previsão ao gráfico
+                plt.plot(month, forecast_value[0], 'ro', label=f'Previsão {month}/2025' if month == 1 else "")  # Plotando previsão
+
+    # Se 2025 estiver nos anos selecionados ou "Todos os anos" for selecionado, desenhar a linha de previsão
     if 2025 in anos_selecionados or "Todos os anos" in anos_selecionados:
-        sns.lineplot(data=graficos[graficos['year'] == 2025], x='month', y='altura', color='red', linestyle='--', label='Previsão 2025')
+        sns.lineplot(data=data_2025, x='month', y='altura', color='red', linestyle='--', label='Previsão 2025')
 
     plt.title(f'{selected_river}', fontsize=16)
     plt.xlabel('Mês', fontsize=14)
