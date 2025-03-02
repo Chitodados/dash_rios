@@ -8,4 +8,3 @@ openpyxl
 requests
 selenium>=4.0.0
 chromedriver-autoinstaller
-datetime
