@@ -17,6 +17,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y wget curl unzip python3-venv python3-pip libxss1 libappindicator3-1 libindicator7
+          
+          # Verificando dependências faltantes
+          sudo apt-get install -f -y
 
       - name: Instalar Google Chrome e ChromeDriver
         run: |
@@ -29,6 +32,11 @@ jobs:
 
           # Forçar a instalação das dependências
           sudo apt-get install -f -y
+
+          # Verificando se há pacotes quebrados
+          sudo dpkg --configure -a
+          sudo apt-get update
+          sudo apt-get upgrade -y
 
           # Baixar e instalar o ChromeDriver compatível com a versão do Google Chrome
           CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9.]+' | head -1)
