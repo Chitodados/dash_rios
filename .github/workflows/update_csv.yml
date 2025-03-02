@@ -8,50 +8,36 @@ on:
 jobs:
   update_csv:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Clonar o repositório
-        uses: actions/checkout@v4
-
       - name: Instalar dependências do sistema
         run: |
           sudo apt-get update
           sudo apt-get install -y wget curl unzip python3-venv python3-pip libxss1 libappindicator3-1 libindicator7
           
-          # Remover pacotes quebrados e tentar corrigir dependências faltantes
+          # Forçar correção de pacotes quebrados
           sudo dpkg --configure -a
           sudo apt-get install -f -y
           sudo apt-get autoremove -y
           sudo apt-get clean
 
+      - name: Verificar serviços e reiniciar
+        run: |
+          sudo systemctl restart ModemManager.service
+          sudo systemctl restart docker.service
+          sudo systemctl restart networkd-dispatcher.service
+          sudo systemctl restart runner-provisioner.service
+          sudo systemctl restart systemd-logind.service
+
       - name: Instalar Google Chrome e ChromeDriver
         run: |
-          # Remover qualquer versão anterior do Google Chrome
-          sudo apt-get remove --purge google-chrome-stable
-
-          # Baixar e instalar o Google Chrome
           wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get install -f -y  # Corrige dependências faltantes
-
-          # Forçar a instalação das dependências
-          sudo apt-get install -f -y
-
-          # Verificar se há pacotes quebrados
-          sudo dpkg --configure -a
-          sudo apt-get update
-          sudo apt-get upgrade -y
-
-          # Baixar e instalar o ChromeDriver compatível com a versão do Google Chrome
+          sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get install -f -y
           CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9.]+' | head -1)
           CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
           wget -q "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
           unzip chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
-
-          # Verificar as versões do Chrome e do ChromeDriver
-          google-chrome --version
-          chromedriver --version
 
       - name: Configurar Python e instalar dependências
         run: |
