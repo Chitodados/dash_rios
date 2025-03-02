@@ -8,3 +8,5 @@ openpyxl
 requests
 selenium>=4.0.0
 chromedriver-autoinstaller
+beautifulsoup4
+selenium
