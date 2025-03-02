@@ -5,6 +5,8 @@ import seaborn as sns
 import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 from io import BytesIO
+from datetime import datetime
+
 import requests
 
 st.markdown("""
@@ -182,7 +184,6 @@ h1, h2, h3, h4, h5, h6 {
 # Gráfico com a evolução das cotas
 # Gráfico com a evolução das cotas
 # Gráfico com a evolução das cotas
-from datetime import datetime
 
 # Obter a data atual
 data_atual = datetime.now()
