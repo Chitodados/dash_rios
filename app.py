@@ -26,7 +26,9 @@ st.markdown("""
 # Configuração do seaborn
 sns.set(style='whitegrid')
 
-# Função para carregar os dados (com cache)
+import os  
+from datetime import datetime
+
 # Função para carregar os dados (com cache)
 @st.cache_data
 def load_data():
@@ -34,11 +36,11 @@ def load_data():
     file_path = "nivel_dos_rios.csv"  # Atualize o caminho conforme necessário
 
     # Verificar se o arquivo existe e ler os dados
-    if os.path.exists(file_path):
+    if os.path.exists(file_path):  # Certifique-se de que o módulo os está importado
         df = pd.read_csv(file_path)
 
         # Verificar se o arquivo é mais recente do que o cache
-        file_mod_time = datetime.fromtimestamp(os.path.getmtime(file_path))
+        file_mod_time = datetime.fromtimestamp(os.path.getmtime(file_path))  # Certifique-se de que datetime está importado
         if file_mod_time > datetime.now() - pd.Timedelta(hours=1):  # Atualizar o cache a cada hora, por exemplo
             st.cache_clear()  # Forçar a limpeza do cache para recarregar os dados
 
