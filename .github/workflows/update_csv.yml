@@ -16,15 +16,12 @@ jobs:
       - name: Instalar dependências do sistema
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget curl unzip python3-venv python3-pip
-          
+          sudo apt-get install -y wget curl unzip python3-venv python3-pip libxss1 libappindicator3-1 libindicator7
+
       - name: Instalar Google Chrome e ChromeDriver
         run: |
           # Remover qualquer versão anterior do Google Chrome para evitar conflitos
           sudo apt-get remove -y google-chrome-stable
-
-          # Instalar dependências necessárias para o Google Chrome
-          sudo apt-get install -y libxss1 libappindicator3-1 libindicator7
 
           # Baixar e instalar o Google Chrome
           wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
