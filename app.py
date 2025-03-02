@@ -252,4 +252,3 @@ if 'comparison_df' in locals():
 st.markdown("---")
 st.write("**Fonte dos Dados:** https://proamanaus.com.br/nivel-dos-rios")
 st.write("**Desenvolvido por:** [Lucas Chitolina¹](https://github.com/Chitolina), [Lucas Chitolina²](https://chitolina.github.io), [DeepSeek](https://chat.deepseek.com/) & [ChatGPT](https://chatgpt.com)")
-
