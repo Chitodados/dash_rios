@@ -18,13 +18,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y wget curl unzip python3-venv python3-pip libxss1 libappindicator3-1 libindicator7
           
-          # Verificando dependências faltantes
+          # Remover pacotes quebrados e tentar corrigir dependências faltantes
+          sudo dpkg --configure -a
           sudo apt-get install -f -y
+          sudo apt-get autoremove -y
+          sudo apt-get clean
 
       - name: Instalar Google Chrome e ChromeDriver
         run: |
-          # Remover qualquer versão anterior do Google Chrome para evitar conflitos
-          sudo apt-get remove -y google-chrome-stable
+          # Remover qualquer versão anterior do Google Chrome
+          sudo apt-get remove --purge google-chrome-stable
 
           # Baixar e instalar o Google Chrome
           wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -33,7 +36,7 @@ jobs:
           # Forçar a instalação das dependências
           sudo apt-get install -f -y
 
-          # Verificando se há pacotes quebrados
+          # Verificar se há pacotes quebrados
           sudo dpkg --configure -a
           sudo apt-get update
           sudo apt-get upgrade -y
