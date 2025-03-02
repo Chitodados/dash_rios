@@ -13,16 +13,35 @@ jobs:
       - name: Clonar o repositório
         uses: actions/checkout@v4
 
+      - name: Corrigir pacotes quebrados antes da instalação do Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget curl unzip
+          sudo apt-get clean
+          sudo apt-get autoremove -y
+          sudo apt-get install -f -y  # Corrigir pacotes pendentes
+          
+          # Baixar e instalar o Chrome
+          wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get install -f -y
+          
+          google-chrome --version    
+
+
       - name: Instalar Google Chrome e ChromeDriver
         run: |
+          sudo apt-get update
+          sudo apt-get install -y wget curl unzip
+          
+          # Baixar o Google Chrome
           wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get -fy install
-          CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9.]+' | head -1)
-          CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
-          wget -q "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
-          unzip chromedriver_linux64.zip
-          sudo mv chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
+          
+          # Instalar o Chrome e corrigir dependências quebradas
+          sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get install -f -y
+          
+          # Verificar se o Chrome foi instalado corretamente
+          google-chrome --version
+
 
       - name: Configurar Python e instalar dependências
         run: |
