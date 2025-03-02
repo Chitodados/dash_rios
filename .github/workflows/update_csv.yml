@@ -20,17 +20,19 @@ jobs:
           
       - name: Instalar Google Chrome e ChromeDriver
         run: |
+          # Remover qualquer versão anterior do Google Chrome para evitar conflitos
+          sudo apt-get remove -y google-chrome-stable
+
+          # Instalar dependências necessárias para o Google Chrome
+          sudo apt-get install -y libxss1 libappindicator3-1 libindicator7
+
           # Baixar e instalar o Google Chrome
           wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get install -f -y  # Corrige dependências faltantes
-      
-          # Remover qualquer versão anterior do Google Chrome para evitar conflitos
-          sudo apt-get remove -y google-chrome-stable
-      
-          # Tentar novamente instalar o Google Chrome
-          sudo dpkg -i google-chrome-stable_current_amd64.deb
-          sudo apt-get install -f -y  # Corrige dependências se necessário
-      
+
+          # Forçar a instalação das dependências
+          sudo apt-get install -f -y
+
           # Baixar e instalar o ChromeDriver compatível com a versão do Google Chrome
           CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9.]+' | head -1)
           CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
@@ -38,7 +40,7 @@ jobs:
           unzip chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
-      
+
           # Verificar as versões do Chrome e do ChromeDriver
           google-chrome --version
           chromedriver --version
