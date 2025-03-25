@@ -1,8 +1,6 @@
 
 # Web Scraping para Atualização Automática de CSV
 
-Este projeto utiliza **GitHub Actions** para rodar um script de **web scraping** todos os dias às 03:00 UTC. O script coleta dados de um site e atualiza um arquivo CSV, que é utilizado em um **dashboard Streamlit**.
-
 ## Visão Geral
 
 O objetivo do projeto é realizar a coleta diária de dados através de web scraping, atualizar um arquivo CSV e armazená-lo no repositório do GitHub. Além disso, o fluxo de trabalho é automatizado para garantir que o arquivo CSV esteja sempre atualizado para o dashboard Streamlit.
